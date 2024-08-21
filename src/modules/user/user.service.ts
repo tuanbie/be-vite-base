@@ -1,58 +1,79 @@
 import { User } from '@common/models/entity/user.entity';
-import {
-  BadRequestException,
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { MESSAGES } from '@common/constants';
-import { appSettings } from '@common/configs/appSetting';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { hashing } from '@common/utils/hashing.util';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateUserDto } from './dto/input.dto';
+import { UserRoles } from '@common/constants';
+import { UpdateUser } from './dto/update.dto';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
   async findUser(email: string) {
-    return await this.userRepository.findOne({
-      where: {
-        email,
-      },
-      relations: ['role'],
-    });
+    const user = await this.userModel.findOne({ email });
+
+    // .select('-password');
+
+    if (!user) return null;
+    return user.toObject();
   }
 
-  async create(): Promise<any> {
-    const newUser = this.userRepository.create();
-    newUser.age = 1;
-    newUser.email = 'chungdi@gmail.com';
-    newUser.name = 'chungdi';
-    newUser.password = await hashing('12345678');
-    newUser.username = 'chungdi';
-    newUser.role = appSettings.role.CAMPUS_MANAGER;
-    const getUser = await this.userRepository.findOne({
-      where: { email: newUser.email },
-    });
-    if (getUser) {
-      throw new ConflictException(MESSAGES.EMAIL_EXISTS);
-    }
-    const builder = await this.userRepository.save(newUser);
-    return builder;
+  async getUserById(_id: string) {
+    const user = await this.userModel.findOne({ _id });
+    return user as any;
   }
 
-  async filter(): Promise<any> {
-    const newUser = await this.userRepository.find({
-      where: {
-        username: 'chungdi',
-      },
-      relations: ['role'],
+  async create(payload: CreateUserDto) {
+    const { password } = payload;
+    const hashPass = await hashing(password);
+
+    const newUser = await this.userModel.create({
+      ...payload,
+      password: hashPass,
+      roles: UserRoles.MEMBER,
     });
-    console.log(newUser);
+    await newUser.save();
     return newUser;
+  }
+
+  async update(_id: string, updateUsersDto: UpdateUser): Promise<any> {
+    const { email, password } = updateUsersDto;
+    const collection = await this.userModel.findOne({ _id });
+
+    if (collection.email !== email) {
+      await this.checkEmailValid(email);
+    }
+
+    if (password) {
+      updateUsersDto.password = await hashing(password);
+    }
+
+    if (!password) {
+      delete updateUsersDto.password;
+    }
+
+    await this.userModel.updateOne(
+      {
+        _id,
+      },
+      updateUsersDto,
+    );
+
+    return {
+      data: await this.userModel.findById(collection?._id),
+    };
+  }
+
+  private async checkEmailValid(email: string) {
+    const user = await this.userModel.findOne({ email });
+    if (user) {
+      throw new UnprocessableEntityException(
+        'email_already_exists',
+        'Email already exists',
+      );
+    }
   }
 }

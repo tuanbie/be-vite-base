@@ -4,8 +4,8 @@ export class ExceptionResponse extends HttpException {
   constructor(status?: HttpStatus, message?: string, data?: any) {
     super(
       {
-        statusCode: status ? status : HttpStatus.BAD_REQUEST,
-        message: message ? message : 'Invalid data!',
+        code: status ? status : HttpStatus.BAD_REQUEST,
+        msg: message ? message : 'Invalid data!',
         data: data || null,
       },
       (status = HttpStatus.OK),

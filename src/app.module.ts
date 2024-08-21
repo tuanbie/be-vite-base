@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { Logging } from './common/providers/logging/logging';
-import { ModelsModule } from './common/models/models.module';
-import { ConfigModule } from '@nestjs/config';
+// import { ModelsModule } from './common/models/models.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from '@common/interceptors/logging/logging.interceptor';
 import { TransformInterceptor } from '@common/interceptors/transform/transform.interceptor';
@@ -13,6 +13,7 @@ import { CachingModule } from './common/providers/caching/caching.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { ModelsModule } from '@common/models/models.module';
 
 @Module({
   imports: [

@@ -17,21 +17,22 @@ export class TransformInterceptor implements NestInterceptor {
         if (res)
           return res.hasOwnProperty('paginationOptions')
             ? {
-                statusCode: ctx.statusCode || 200,
-                success: true,
-                message: res.message,
+                code: ctx.statusCode || 200,
+                // success: true,
+                msg: res.message,
                 data: res.data || null,
               }
             : res.hasOwnProperty('message')
               ? {
-                  statusCode: ctx.statusCode || 200,
-                  success: true,
-                  message: res.message,
+                  code: ctx.statusCode || 200,
+                  // success: true,
+                  msg: res.message,
                   data: res.data || null,
                 }
               : {
-                  statusCode: ctx.statusCode || 200,
-                  success: true,
+                  code: ctx.statusCode || 200,
+                  msg: res.message,
+                  // success: true,]
                   data: res || null,
                 };
       }),

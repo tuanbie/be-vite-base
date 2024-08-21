@@ -23,15 +23,16 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@CurrentUser() user: ICurrentUser) {
+    console.log(user);
     return await this.authService.login(user);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  async getProfile(@CurrentUser() user: ICurrentUser) {
-    return user;
-  }
+  // @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @Get('profile')
+  // async getProfile(@CurrentUser() user: ICurrentUser) {
+  //   return user;
+  // }
 
   @Post('refresh')
   async refreshToken(@Body() body: RefreshTokenDto) {

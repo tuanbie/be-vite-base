@@ -1,16 +1,21 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { appSettings } from '@common/configs/appSetting';
-import * as provider from './entity';
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from './entity/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      ...appSettings.db,
-      entities: Object.values(provider),
+    MongooseModule.forRoot(appSettings.mongoose.dbConn, {
+      dbName: appSettings.mongoose.dbName,
     }),
-    TypeOrmModule.forFeature(Object.values(provider)),
+    MongooseModule.forFeature([
+      {
+        name: User.name,
+        schema: UserSchema,
+      },
+    ]),
   ],
-  exports: [TypeOrmModule],
+  providers: [],
+  exports: [MongooseModule],
 })
 export class ModelsModule {}

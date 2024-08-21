@@ -16,48 +16,48 @@ export class AllExceptionFilter implements ExceptionFilter {
     exception: HttpException | Error,
   ): void {
     let responseBody: any = { message: 'Internal server error' };
-    let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+    let code = HttpStatus.INTERNAL_SERVER_ERROR;
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
     if (exception instanceof HttpException) {
-      statusCode = exception.getResponse()['statusCode'];
-      let message = exception.getResponse()['message'];
+      code = exception.getResponse()['statusCode'];
+      let msg = exception.getResponse()['message'];
 
-      if (Array.isArray(message)) {
-        message = message.join(', ');
+      if (Array.isArray(msg)) {
+        msg = msg.join(', ');
       }
       responseBody = {
-        statusCode: statusCode || exception.getStatus(),
-        message: message || exception.message,
+        code: code || exception.getStatus(),
+        msg: msg || exception.message,
         data: null,
-        timestamp: new Date().toISOString(),
+        // timestamp: new Date().toISOString(),
         path: request.url,
       };
     } else if (exception instanceof Error) {
       responseBody = {
-        statusCode: statusCode || statusCode,
+        code: code || code,
         message: exception.stack,
         data: null,
         timestamp: new Date().toISOString(),
         path: request.url,
       };
     }
-    if (statusCode == 205) {
-      statusCode = 400;
+    if (code == 205) {
+      code = 400;
     }
     Logger.error(responseBody);
     response
-      .status(statusCode || HttpStatus.INTERNAL_SERVER_ERROR)
+      .status(code || HttpStatus.INTERNAL_SERVER_ERROR)
       .json(responseBody);
   }
 
   private handleMessage(exception: HttpException | Error): void {
-    let message = 'Internal Server Error';
+    let msg = 'Internal Server Error';
     if (exception instanceof HttpException)
-      message = JSON.stringify(exception.getResponse());
+      msg = JSON.stringify(exception.getResponse());
     else if (exception instanceof Error)
-      message = JSON.stringify(exception.stack.toString());
+      msg = JSON.stringify(exception.stack.toString());
   }
 
   public catch(exception: any, host: ArgumentsHost) {

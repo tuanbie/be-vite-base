@@ -1,31 +1,52 @@
-import { CustomEntity } from '@common/decorators/custom-entity.decorator';
-import { Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseEntity } from './base.entity';
-import { Role } from './role.entity';
+import _ from 'lodash';
+import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+import { COLLECTION_NAME } from '@common/constants/enum';
+import { Property } from '@common/decorators/property.decorator';
+import { UserRoles } from '@common/constants';
 
-@CustomEntity(User.name)
-export class User extends BaseEntity {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+@Schema({
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
+  collection: COLLECTION_NAME.USER,
+})
+export class User extends Document {
+  @Property({ type: String.name })
+  @Prop({ type: String })
+  id: string;
 
-  @Column({ type: 'varchar', length: 30 })
-  name: string;
+  @Property({ type: String.name })
+  @Prop({ type: String, required: true })
+  full_name: string;
 
-  @Column('text')
-  username: string;
-
-  @Column({ type: 'varchar', length: 40, unique: true, nullable: false })
+  @Property({ type: String.name })
+  @Prop({ type: String, required: true, unique: true })
   email: string;
 
-  @Column({ type: 'int' })
-  age: number;
+  @Property({ type: String.name })
+  @Prop({ type: String })
+  phone: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Property({ type: String.name, ref: COLLECTION_NAME.ROLE })
+  @Prop({ enum: UserRoles, type: Object })
+  roles: UserRoles;
+
+  @Property({ type: String.name })
+  @Prop({ type: String })
   password: string;
 
-  @ManyToOne(() => Role, (role) => role.users)
-  @JoinColumn({
-    name: 'role',
-  })
-  role: Role | number;
+  @Property({ type: Boolean.name })
+  @Prop({ type: Boolean })
+  activated: boolean;
+
+  @Property({ type: Number.name })
+  @Prop({ default: 1 })
+  is_active: number;
+
+  // @Property({ type: String.name })
+  // @Prop({ type: String })
+  // refresh_token: string;
 }
+export const UserSchema = SchemaFactory.createForClass(User);

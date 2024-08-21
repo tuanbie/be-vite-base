@@ -1,17 +1,17 @@
 interface Response {
-  statusCode?: number;
-  message?: string;
+  code?: number;
+  msg?: string;
   data?: any;
 }
 
 export class BaseResponse<T> {
-  readonly statusCode: number;
-  readonly message: string;
+  readonly code: number;
+  readonly msg: string;
   readonly data: T;
 
-  constructor({ statusCode, message, data }: Response) {
-    this.statusCode = statusCode || 200;
-    this.message = message || 'Success';
+  constructor({ code, msg, data }: Response) {
+    this.code = code || 200;
+    this.msg = msg || 'Success';
     this.data = data || null;
   }
 }
