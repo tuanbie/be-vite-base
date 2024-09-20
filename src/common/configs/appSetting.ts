@@ -9,9 +9,13 @@ export const appSettings = {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     password: process.env.DB_PASSWORD,
-    username: process.env.DB_USERNAME,
+    username: process.env.DB_USER,
     database: process.env.DB_NAME,
     synchronize: true,
+    ssl: {
+      rejectUnauthorized: true,
+      ca: `${process.env.CA}`,
+    },
     // logging: development,
   } as TypeOrmModuleOptions,
   jwt: {
