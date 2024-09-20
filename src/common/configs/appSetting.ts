@@ -18,7 +18,7 @@ export const appSettings = {
     host: process.env.REDIS_HOST,
     port: Number(process.env.REDIS_PORT),
     password: process.env.REDIS_PASSWORD,
-    username: process.env.REDIS_USERNAME,
+    email: process.env.REDIS_USERNAME,
   },
   do_endpoint: process.env.DO_ENDPOINT,
   do_access_key: process.env.DO_ACCESS_KEY,

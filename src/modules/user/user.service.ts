@@ -1,11 +1,16 @@
 import { User } from '@common/models/entity/user.entity';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { hashing } from '@common/utils/hashing.util';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/input.dto';
-import { UserRoles } from '@common/constants';
+import { MESSAGES, UserRoles } from '@common/constants';
 import { UpdateUser } from './dto/update.dto';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 @Injectable()
 export class UserService {
   constructor(
@@ -27,9 +32,12 @@ export class UserService {
   }
 
   async create(payload: CreateUserDto) {
-    const { password } = payload;
+    const { password, email } = payload;
     const hashPass = await hashing(password);
-
+    const checkUser = await this.userModel.findOne({ email });
+    if (checkUser) {
+      throw new BadRequestException(MESSAGES.EMAIL_EXISTS);
+    }
     const newUser = await this.userModel.create({
       ...payload,
       password: hashPass,

@@ -15,7 +15,7 @@ export class AuthController {
   @ApiBody({
     schema: {
       example: {
-        username: 'string',
+        email: 'example@gmail.com',
         password: 'string',
       },
     },
