@@ -5,6 +5,7 @@ import { compareHash } from '@common/utils/hashing.util';
 import { UserService } from '@modules/user/user.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { LoginGoogleDto } from './dtos/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +77,7 @@ export class AuthService {
 
   async login(result: ICurrentUser) {
     const payload = {
-      email: result.email,
+      username: result.username,
     };
 
     const token = await this.autoGenerateToken(payload);
@@ -85,5 +86,15 @@ export class AuthService {
       user: result,
       token,
     };
+  }
+
+  async loginWithGoogle(body: LoginGoogleDto) {
+    const { google_id } = body;
+    const getUser = await this.userService.getUserByGoogleId(google_id);
+    if (!getUser) {
+      const createUser = await this.userService;
+    }
+    console.log(getUser);
+    return getUser;
   }
 }

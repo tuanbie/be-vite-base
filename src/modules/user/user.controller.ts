@@ -1,4 +1,5 @@
 import {
+  Body,
   ClassSerializerInterceptor,
   Get,
   Post,
@@ -6,6 +7,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CustomController } from '@common/decorators/custom-controller.decorator';
+import { CreateUserDto } from './dto/input.dto';
+import { Authorize } from '@common/decorators/authorize.decorator';
+import { UserRoles } from '@common/constants/role.enum';
 
 @CustomController('user')
 export class UserController {
@@ -18,8 +22,9 @@ export class UserController {
   }
 
   @Post('create')
-  @UseInterceptors(ClassSerializerInterceptor)
-  public async create(): Promise<any> {
-    return await this.userService.create();
+  // @UseInterceptors(ClassSerializerInterceptor)
+  @Authorize(UserRoles.ADMIN)
+  public async create(@Body() body: CreateUserDto): Promise<any> {
+    return await this.userService.create(body);
   }
 }

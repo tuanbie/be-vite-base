@@ -7,6 +7,7 @@ import { ICurrentUser } from '@common/types/current-user.type';
 import { CustomController } from '@common/decorators/custom-controller.decorator';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LoginGoogleDto } from './dtos/login.dto';
 
 @CustomController('auth')
 export class AuthController {
@@ -36,5 +37,10 @@ export class AuthController {
   @Post('refresh')
   async refreshToken(@Body() body: RefreshTokenDto) {
     return await this.authService.refreshToken(body.refreshToken);
+  }
+
+  @Post('login-with-google')
+  async loginWithGoogle(@Body() body: LoginGoogleDto) {
+    return await this.authService.loginWithGoogle(body);
   }
 }
